@@ -1,3 +1,42 @@
+#!/bin/bash
+clear
+echo "#################################################################"
+echo "#             By TheFantas® - Mod Reseller  CWP                 #"
+echo "#################################################################"
+echo ""
+
+API_KEY=$(cat /dev/urandom | tr -dc 'a-zA-Z0-9' | fold -w 20 | head -n 1)
+PASS_MYSQL=$(grep db_pass /usr/local/cwpsrv/htdocs/resources/admin/include/db_conn.php | xargs | sed 's/$db_pass = //g;s/;//g')
+
+touch /usr/local/cwp/.conf/api_allowed.conf
+touch /usr/local/cwpsrv/htdocs/resources/client/include/3rdparty.php
+touch /usr/local/cwp/.conf/api_key.conf
+
+sed -i '$a 127.0.0.1' /usr/local/cwp/.conf/api_allowed.conf
+sed -i '$a API_KEY' /usr/local/cwp/.conf/api_key.conf
+
+# Create 3rdparty
+cat > /usr/local/cwpsrv/htdocs/resources/client/include/3rdparty.php <<EOF
+<li><a href="index.php?module=reseller" onClick="addURL(this)"><span class="icon16 icomoon-icon-arrow-right-3"></span>Reseller</a></li><script>
+function addURL(element)
+{
+    $(element).attr('href', function() {
+        return this.href + '&owner='+ \$(".usernav > li > a:first").text().trim();
+    });
+}</script>
+EOF
+
+# MySQL Database import
+mysql -u root -p$PASS_MYSQL << EOF
+use root_cwp;
+ALTER TABLE user ADD COLUMN owner_id int(11) NOT NULL AFTER backup;
+ALTER TABLE user ADD COLUMN is_reseller int(1) NOT NULL AFTER backup;
+EOF
+
+touch /usr/local/cwpsrv/htdocs/resources/client/modules/reseller.php
+
+# Create reseller.php
+cat > /usr/local/cwpsrv/htdocs/resources/client/include/reseller.php <<EOF
 <?php
 /*	By TheFantas Read */
 
@@ -284,3 +323,8 @@ class reseller
 \$reseller->initalize();
 
 ?>
+EOF
+
+echo "#################################################################"
+echo "#                     finished process                          #"
+echo "#################################################################"
