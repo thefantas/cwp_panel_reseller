@@ -35,7 +35,7 @@ ALTER TABLE user ADD COLUMN is_reseller int(1) NOT NULL AFTER backup;
 EOF
 
 # Create reseller.php
-cat > /usr/local/cwpsrv/htdocs/resources/client/include/3rdparty.php <<EOF
+cat > /usr/local/cwpsrv/htdocs/resources/client/include/reseller.php <<EOF
 <?php
 /*	By TheFantas Read */
 
