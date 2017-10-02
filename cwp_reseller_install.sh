@@ -10,6 +10,7 @@ PASS_MYSQL=$(grep db_pass /usr/local/cwpsrv/htdocs/resources/admin/include/db_co
 
 touch /usr/local/cwp/.conf/api_allowed.conf
 touch /usr/local/cwpsrv/htdocs/resources/client/include/3rdparty.php
+touch /usr/local/cwp/.conf/api_key.conf
 
 sed -i '$a 127.0.0.1' /usr/local/cwp/.conf/api_allowed.conf
 sed -i '$a API_KEY' /usr/local/cwp/.conf/api_key.conf
@@ -25,14 +26,14 @@ function addURL(element)
 }</script>
 EOF
 
-touch /usr/local/cwpsrv/htdocs/resources/client/modules/reseller.php
-
 # MySQL Database import
 mysql -u root -p$PASS_MYSQL << EOF
 use root_cwp;
 ALTER TABLE user ADD COLUMN owner_id int(11) NOT NULL AFTER backup;
 ALTER TABLE user ADD COLUMN is_reseller int(1) NOT NULL AFTER backup;
 EOF
+
+touch /usr/local/cwpsrv/htdocs/resources/client/modules/reseller.php
 
 # Create reseller.php
 cat > /usr/local/cwpsrv/htdocs/resources/client/include/reseller.php <<EOF
