@@ -21,7 +21,7 @@ cat > /usr/local/cwpsrv/htdocs/resources/client/include/3rdparty.php <<EOF
 function addURL(element)
 {
     $(element).attr('href', function() {
-        return this.href + '&owner='+ $(".usernav > li > a:first").text().trim();
+        return this.href + '&owner='+ \$(".usernav > li > a:first").text().trim();
     });
 }</script>
 EOF
