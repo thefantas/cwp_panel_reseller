@@ -13,11 +13,17 @@ touch /usr/local/cwp/.conf/api_allowed.conf
 touch /usr/local/cwpsrv/htdocs/resources/client/include/3rdparty.php
 touch /usr/local/cwp/.conf/api_key.conf
 
-echo "127.0.0.1" >> /usr/local/cwp/.conf/api_allowed.conf
-echo "$API_KEY" >> /usr/local/cwp/.conf/api_key.conf
+if ! [ $(grep 127.0.0.1 /usr/local/cwp/.conf/api_allowed.conf | wc -l) -ge 1 ];then
+	echo "127.0.0.1" >> /usr/local/cwp/.conf/api_allowed.conf
+fi
+
+
+if ! [ $(grep $API_KEY /usr/local/cwp/.conf/api_key.conf | wc -l) -ge 1 ];then
+	echo "$API_KEY" >> /usr/local/cwp/.conf/api_key.conf
+fi
 
 # Create 3rdparty
-cat > /usr/local/cwpsrv/htdocs/resources/client/include/3rdparty.php <<EOF
+cat >> /usr/local/cwpsrv/htdocs/resources/client/include/3rdparty.php <<EOF
 <li><a href="index.php?module=reseller" onClick="addURL(this)"><span class="icon16 icomoon-icon-arrow-right-3"></span>Reseller</a></li><script>
 function addURL(element)
 {
@@ -25,6 +31,13 @@ function addURL(element)
         return this.href + '&owner='+ \$(".usernav > li > a:first").text().trim();
     });
 }</script>
+EOF
+
+touch /usr/local/cwpsrv/htdocs/resources/admin/include/3rdparty.php
+
+# Create 3rdparty admin
+cat >> /usr/local/cwpsrv/htdocs/resources/admin/include/3rdparty.php <<EOF
+<li><a href="index.php?module=reseller"><span class="icon16 icomoon-icon-arrow-right-3"></span>Reseller</a></li>
 EOF
 
 # MySQL Database import
@@ -37,7 +50,7 @@ EOF
 touch /usr/local/cwpsrv/htdocs/resources/client/modules/reseller.php
 
 # Create reseller.php
-cat > /usr/local/cwpsrv/htdocs/resources/client/modules/reseller.php <<EOF
+cat >> /usr/local/cwpsrv/htdocs/resources/client/modules/reseller.php <<EOF
 <?php
 /*	By TheFantas Read */
 
@@ -325,6 +338,13 @@ class reseller
 
 ?>
 EOF
+
+touch /usr/local/cwpsrv/htdocs/resources/admin/modules/reseller.php
+
+# Create reseller.php admin
+cat >> /usr/local/cwpsrv/htdocs/resources/admin/modules/reseller.php <<EOF
+EOF
+
 echo ""
 echo "#################################################################"
 echo "#                     finished process                          #"
