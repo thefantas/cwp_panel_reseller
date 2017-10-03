@@ -343,6 +343,144 @@ touch /usr/local/cwpsrv/htdocs/resources/admin/modules/reseller.php
 
 # Create reseller.php admin
 cat >> /usr/local/cwpsrv/htdocs/resources/admin/modules/reseller.php <<EOF
+<?php
+/*	By TheFantas Read */
+
+if ( !isset( \$include_path ) )
+{
+    echo "invalid access";
+    exit( );
+}
+
+class reseller
+{
+    private \$status_reseller 	= "";
+    private \$version_reseller 	= "1.0";
+		
+    public \$alert = "";	
+	public \$owner = "";
+	public \$id_username = "";
+
+    public function __construct()
+    {
+		include '/usr/local/cwpsrv/htdocs/resources/admin/include/db_conn.php';
+		global \$db_host, \$db_name, \$db_user, \$db_pass, \$crypt_pwd;
+		@\$mysqli = new mysqli(\$db_host, \$db_user, \$db_pass, \$db_name);
+		
+		echo '<center><b>Reseller Account</b></center> <br>';
+	
+		switch (@\$_POST['api_cmd']) {
+			case "account_reseller":
+				if ((strlen(@\$_POST['domain']) > 1) && (strlen(@\$_POST['username']) > 1)) {
+					\$mysqli->query("UPDATE user SET is_reseller='1' WHERE username='".@\$_POST['username']."' LIMIT 1");
+					\$this->alert 	= "alert-success";
+					\$this->message 	= "<strong>Aviso!</strong> Reseller Conversion Account.";
+					\$this->toHtml();
+				} else {
+					\$this->alert 	= "alert-danger";
+					\$this->message 	= "<strong>Error!</strong> The reseller account could not be changed.".str_replace(array('DOMAIN_R', 'USERNAME_R'), array(@\$_POST['domain'], @\$_POST['username']), \$this->account_reseller);
+					\$this->toHtml();
+				}
+				break;
+			case "account_non_reseller":
+				if ((strlen(@\$_POST['domain']) > 1) && (strlen(@\$_POST['username']) > 1)) {
+					\$mysqli->query("UPDATE user SET is_reseller='0' WHERE username='".@\$_POST['username']."' LIMIT 1");
+					\$this->alert 	= "alert-success";
+					\$this->message 	= "<strong>Aviso!</strong> Non-Reseller Conversion Account.";
+					\$this->toHtml();
+				} else {
+					\$this->alert 	= "alert-danger";
+					\$this->message 	= "<strong>Error!</strong> The Non-Reseller account could not be changed.";
+					\$this->toHtml();
+				}
+				break;
+		}
+    }
+	
+    public function initalize()
+    {
+		\$this->check_is_reseller();
+    }
+
+    public function check_is_reseller()
+    {		
+		global \$db_host, \$db_name, \$db_user, \$db_pass, \$crypt_pwd;
+		@\$mysqli = new mysqli(\$db_host, \$db_user, \$db_pass, \$db_name);
+		
+		/* check connection */
+		if (\$mysqli->connect_error) {
+			die("Error: The server can't connect to the database: Probably there isn't one.");
+			exit();
+		}
+		
+		/* change character set to utf8 */
+		if (!\$mysqli->set_charset("utf8")) {
+			printf("Error loading character set utf8: %s\n", \$mysqli->error);
+			exit;
+		}
+					
+				\$this->alert = "alert-info";
+				\$this->message = "<strong>Welcome!</strong> Account List.";
+				\$this->toHtml();
+				
+				\$result 	= \$mysqli->query("SELECT * FROM user");
+				if (\$result->num_rows > 0) {
+					echo '<table class="table table-bordered dataTable no-footer" id="userTable" role="grid" aria-describedby="userTable_info" style="width: 100%;" width="100%" cellspacing="1" cellpadding="5" border="0" align="center">
+						<thead>
+						  <tr class="evenrowcolor" role="row"><th class="sorting_asc" tabindex="0" aria-controls="userTable" rowspan="1" colspan="1" style="width: 119px;" aria-label="Username: activate to sort column descending" aria-sort="ascending">Username</th><th class="sorting" tabindex="0" aria-controls="userTable" rowspan="1" colspan="1" style="width: 320px;" aria-label="Domain: activate to sort column ascending">Domain</th><th class="sorting" tabindex="0" aria-controls="userTable" rowspan="1" colspan="1" style="width: 160px;" aria-label="IP Address: activate to sort column ascending">IP Address</th><th class="sorting" tabindex="0" aria-controls="userTable" rowspan="1" colspan="1" style="width: 196px;" aria-label="Email: activate to sort column ascending">Email</th><th class="sorting" tabindex="0" aria-controls="userTable" rowspan="1" colspan="1" style="width: 208px;" aria-label="Setup Time: activate to sort column ascending">Setup Time</th><th class="sorting" tabindex="0" aria-controls="userTable" rowspan="1" colspan="1" style="width: 112px;" aria-label="Reseller: activate to sort column ascending">Reseller</th><th class="sorting" tabindex="0" aria-controls="userTable" rowspan="1" colspan="1" style="width: 109px;" aria-label="Action: activate to sort column ascending">Action</th></tr>
+						</thead>
+						<tbody>';
+					while(\$row = \$result->fetch_assoc()) {
+						\$id				= \$row['id'];
+						\$username		= \$row['username'];
+						\$domain			= \$row['domain'];
+						\$ip_address		= \$row['ip_address'];
+						\$email			= \$row['email'];
+						\$setup_date		= \$row['setup_date'];
+						\$is_reseller		= (\$row['is_reseller'])?'True':'False';
+						\$owner_id		= \$row['owner_id'];
+						echo '<tr role="row" class="odd"><td class="sorting_1">'.\$username.' <a target="_blank" title="Open UserDir http://'.\$ip_address.'/~'.\$username.'" href="http://'.\$ip_address.'/~'.\$username.'"><img src="design/img/start.png"></a></td><td>'.\$domain.' <a target="_blank" title="Open site http://'.\$domain.'" href="http://'.\$domain.'"><img src="design/img/start.png"></a></td><td>'.\$ip_address.'</td><td>'.\$email.'</td><td>'.\$setup_date.'</td><td>'.\$is_reseller.'</td><td>
+							<form action="" method="post" onsubmit="return confirm(\'Are you sure you want to Reseller account: '.\$username.' ?\');">
+								<input name="ifpost" size="0" value="yes" type="hidden">
+								<input name="api_cmd" size="0" value="account_reseller" type="hidden">
+								<input name="username" value="'.\$username.'" size="0" type="hidden">
+								<input name="domain" value="'.\$domain.'" size="0" type="hidden">
+								<div class="form-group">
+										<button type="submit" title="Reseller User" class="btn btn-warning btn-xs">Reseller</button>
+								</div>
+							</form>
+							<form action="" method="post" onsubmit="return confirm(\'Are you sure you want to Non-Reseller account: '.\$username.' ?\');">
+								<input name="ifpost" size="0" value="yes" type="hidden">
+								<input name="api_cmd" size="0" value="account_non_reseller" type="hidden">
+								<input name="username" value="'.\$username.'" size="0" type="hidden">
+								<input name="domain" value="'.\$domain.'" size="0" type="hidden">
+								<div class="form-group">
+										<button type="submit" title="Non-Reseller User" class="btn btn-success btn-xs">Non-Reseller</button>
+								</div>
+							</form>
+							</td></tr>';
+					}
+					echo '</tbody></table>';
+					
+				} else {
+					echo 'No reconciliation accounts.';
+				}
+    }
+	
+	public function toHtml()
+	{
+			echo '<div class="alert '.\$this->alert.'">  
+				<a class="close" data-dismiss="alert">×</a>  
+				'.\$this->message.' 
+			       </div>';	
+	}
+
+}
+
+\$reseller = new reseller();
+\$reseller->initalize();
+
+?>
 EOF
 
 echo ""
