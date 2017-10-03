@@ -13,7 +13,7 @@ touch /usr/local/cwpsrv/htdocs/resources/client/include/3rdparty.php
 touch /usr/local/cwp/.conf/api_key.conf
 
 sed -i '$a 127.0.0.1' /usr/local/cwp/.conf/api_allowed.conf
-sed -i '$a API_KEY' /usr/local/cwp/.conf/api_key.conf
+sed -i '$a $API_KEY' /usr/local/cwp/.conf/api_key.conf
 
 # Create 3rdparty
 cat > /usr/local/cwpsrv/htdocs/resources/client/include/3rdparty.php <<EOF
