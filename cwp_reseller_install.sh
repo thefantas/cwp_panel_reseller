@@ -37,7 +37,7 @@ EOF
 touch /usr/local/cwpsrv/htdocs/resources/client/modules/reseller.php
 
 # Create reseller.php
-cat > /usr/local/cwpsrv/htdocs/resources/client/include/reseller.php <<EOF
+cat > /usr/local/cwpsrv/htdocs/resources/client/modules/reseller.php <<EOF
 <?php
 /*	By TheFantas Read */
 
