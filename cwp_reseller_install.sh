@@ -7,6 +7,7 @@ echo ""
 
 API_KEY=$(cat /dev/urandom | tr -dc 'a-zA-Z0-9' | fold -w 20 | head -n 1)
 PASS_MYSQL=$(grep db_pass /usr/local/cwpsrv/htdocs/resources/admin/include/db_conn.php | xargs | sed 's/$db_pass = //g;s/;//g')
+echo "API_KEY = $API_KEY"
 
 touch /usr/local/cwp/.conf/api_allowed.conf
 touch /usr/local/cwpsrv/htdocs/resources/client/include/3rdparty.php
