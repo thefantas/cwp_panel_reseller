@@ -76,7 +76,7 @@ class reseller
 		include '/usr/local/cwpsrv/htdocs/resources/admin/include/db_conn.php';
 		global \$db_host, \$db_name, \$db_user, \$db_pass, \$crypt_pwd;
 		@\$mysqli = new mysqli(\$db_host, \$db_user, \$db_pass, \$db_name);
-		\$this->owner 			= @\$_SESION['username'];
+		\$this->owner 			= @\$_SESSION['username'];
 		
 		\$result 	= \$mysqli->query("SELECT id FROM user WHERE username='".\$this->owner."' LIMIT 1");
 		if (\$result->num_rows > 0) {
