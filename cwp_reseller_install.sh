@@ -24,13 +24,7 @@ fi
 
 # Create 3rdparty
 cat >> /usr/local/cwpsrv/htdocs/resources/client/include/3rdparty.php <<EOF
-<li><a href="index.php?module=reseller" onClick="addURL(this)"><span class="icon16 icomoon-icon-arrow-right-3"></span>Reseller</a></li><script>
-function addURL(element)
-{
-    \$(element).attr('href', function() {
-        return this.href + '&owner='+ \$(".usernav > li > a:first").text().trim();
-    });
-}</script>
+<li><a href="index.php?module=reseller"><span class="icon16 icomoon-icon-arrow-right-3"></span>Reseller</a></li>
 EOF
 
 touch /usr/local/cwpsrv/htdocs/resources/admin/include/3rdparty.php
@@ -82,7 +76,7 @@ class reseller
 		include '/usr/local/cwpsrv/htdocs/resources/admin/include/db_conn.php';
 		global \$db_host, \$db_name, \$db_user, \$db_pass, \$crypt_pwd;
 		@\$mysqli = new mysqli(\$db_host, \$db_user, \$db_pass, \$db_name);
-		\$this->owner 			= @\$_GET['owner'];
+		\$this->owner 			= @\$_SESION['username'];
 		
 		\$result 	= \$mysqli->query("SELECT id FROM user WHERE username='".\$this->owner."' LIMIT 1");
 		if (\$result->num_rows > 0) {
